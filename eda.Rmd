@@ -1,0 +1,194 @@
+---
+title: "eda"
+output: 
+  html_notebook:
+      code_folding: hide
+      toc: true
+      toc_float: true
+---
+
+## Load Libraries
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+## Import and View Data
+```{r message = FALSE}
+df <- readr::read_csv("data/processed_data.csv")
+
+# grouping rare sources into 'other'
+df <- mutate(df,
+    Src = if_else(Src %in% c("Music", "-"),
+                  "Other",
+                  if_else(Src == "Novel", "Light novel", Src)
+    )
+  ) 
+# set theme
+theme_set(theme_light())
+
+head(df, 10)
+```
+
+## Univariate Analysis
+### Episodes
+summary statistics:
+```{r}
+summary(df$Eps)
+
+df %>%
+  ggplot(aes(x = Eps)) +
+  geom_histogram(binwidth = 6.5) +
+  labs(
+    title = "Distribution of Number of Episodes",
+    x = "Number of Episodes",
+    y = "Count"
+  )
+```
+
+### Members
+summary statistics:
+```{r}
+summary(df$Members)
+
+df %>%
+  ggplot(aes(x = Members)) +
+  geom_histogram(binwidth = 106700) +
+  labs(
+    title = "Distribution of Number of Members",
+    x = "Members",
+    y = "Count"
+  )
+df %>%
+  ggplot(aes(x = Members)) +
+  geom_histogram(binwidth = 30) +
+  scale_x_log10(labels = scales::comma) +
+  labs(
+    title = "Distribution of Number of Members",
+    x = "Members",
+    y = "Count"
+  )
+```
+
+### Score
+summary statistics:
+```{r}
+summary(df$Score)
+
+df %>%
+  ggplot(aes(x = Score)) +
+  geom_histogram(binwidth = 0.6) +
+  labs(
+    title = "Distribution of Scores",
+    x = "Scores",
+    y = "Count"
+  )
+```
+
+### Sources
+```{r}
+df %>%
+  count(Src) %>%
+  ggplot(aes(x = reorder(Src, n), y = n)) +
+  geom_bar(stat = "identity", width = 0.6) +
+  labs(
+   title = "Comparison of Different Anime Sources",
+   x = "Source",
+   y = "Count"
+  )
+```
+
+### Genres
+```{r}
+# new df in long format
+categorical <- df %>%
+  separate(Genres, paste("G", 1:9), sep = ",", extra = "drop") %>%
+  pivot_longer(c(4:12), values_to = "Genre", values_drop_na = TRUE) %>%
+  select(-name)
+
+categorical %>%
+  count(Genre) %>%
+  ggplot(aes(x = reorder(Genre, n), y = n)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(
+    title = "Comparison of Genres",
+    x = "Genre",
+    y = "Count"
+  )
+```
+
+## Bivariate Analysis
+### Eps and Score
+```{r}
+df %>%
+  ggplot(aes(x = Eps, y = Score, na.rm = TRUE)) +
+  geom_point() +
+  ggtitle("Score by Number of Episodes")
+```
+
+#### Correlation Test
+```{r}
+cor.test(df$Score, df$Eps, method = "pearson")
+```
+
+### Members and Score
+```{r}
+lin <- df %>%
+  ggplot(aes(x = Members , y = Score)) +
+  geom_point() +
+  ggtitle("Score by Number of Members") 
+
+# in log scale
+log <- df %>%
+  ggplot(aes(x = Members , y = Score)) +
+  geom_point() +
+  scale_x_log10(labels = scales::comma) +
+  ggtitle("Score by Number of Members in Log Scale") 
+
+gridExtra::grid.arrange(lin, log)
+```
+
+#### Correlation Test
+```{r}
+cor.test(df$Score, df$Members, method = "pearson")
+```
+
+### Members and Eps
+```{r}
+df %>%
+  ggplot(aes(x = Members, y = Eps)) +
+  geom_point() +
+  ggtitle("Number of Epidodes by Number of Members")
+```
+
+#### Correlation Test
+```{r}
+cor.test(df$Eps, df$Members, method = "pearson")
+```
+
+### Score and Source
+```{r}
+df %>%
+  mutate(Src = as.factor(Src)) %>%
+  group_by(Src) %>%
+  ggplot(aes(x = Src, y = Score)) +
+  geom_boxplot()
+```
+
+### Score and Genre
+```{r}
+# average score and genre
+categorical %>%
+  group_by(Genre) %>%
+  ggplot(aes(x = Genre, y = Score)) +
+  geom_boxplot() +
+  coord_flip() +
+  labs(
+    title = "Average Score by Genre",
+    x = "Genre",
+    y = "Average Score"
+  )
+```
+
