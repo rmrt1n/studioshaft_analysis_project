@@ -1,11 +1,15 @@
 ---
-title: "eda"
+title: "EDA of Animes by Studio SHAFT"
 output: 
   html_notebook:
       code_folding: hide
       toc: true
       toc_float: true
 ---
+
+```{r include = FALSE}
+knitr::opts_chunk$set(warning = FALSE)
+```
 
 ## Load Libraries
 ```{r}
@@ -62,10 +66,10 @@ df %>%
   )
 df %>%
   ggplot(aes(x = Members)) +
-  geom_histogram(binwidth = 30) +
+  geom_histogram() +
   scale_x_log10(labels = scales::comma) +
   labs(
-    title = "Distribution of Number of Members",
+    title = "Distribution of Number of Members on Log Scale",
     x = "Members",
     y = "Count"
   )
@@ -174,7 +178,11 @@ df %>%
   mutate(Src = as.factor(Src)) %>%
   group_by(Src) %>%
   ggplot(aes(x = Src, y = Score)) +
-  geom_boxplot()
+  geom_boxplot() +
+  labs(
+    title = "Distribution of Score Grouped by Source",
+    x = "Source"
+  )
 ```
 
 ### Score and Genre
@@ -186,9 +194,9 @@ categorical %>%
   geom_boxplot() +
   coord_flip() +
   labs(
-    title = "Average Score by Genre",
+    title = "Distribution of Score Grouped by Genre",
     x = "Genre",
-    y = "Average Score"
+    y = "Score"
   )
 ```
 
