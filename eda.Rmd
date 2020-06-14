@@ -121,6 +121,21 @@ categorical %>%
     x = "Genre",
     y = "Count"
   )
+
+# top 10 genres
+top10 <- categorical %>%
+  count(Genre) %>%
+  top_n(10)
+
+top10 %>%
+  ggplot(aes(x = reorder(Genre, n), y = n)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(
+    title = "Top 10 Genres",
+    x = "Genre",
+    y = "Count"
+  )
 ```
 
 ## Bivariate Analysis
@@ -187,16 +202,14 @@ df %>%
 
 ### Score and Genre
 ```{r}
-# average score and genre
 categorical %>%
-  group_by(Genre) %>%
+  filter(Genre %in% top10$Genre) %>%
   ggplot(aes(x = Genre, y = Score)) +
   geom_boxplot() +
   coord_flip() +
   labs(
-    title = "Distribution of Score Grouped by Genre",
+    title = "Distribution of Score of Top 10 Genres",
     x = "Genre",
     y = "Score"
   )
-```
 

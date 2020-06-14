@@ -43,14 +43,10 @@ df2 <- data.frame(cbind(id = c(1:25), actuals = test$Score, predicteds = pred2))
 head(df1, 10)
 head(df2, 10)
 
-# calculate MAE and RMSE
-mse1 <- mean((df1$actuals - df1$predicteds)^2)
-mae1 <- mean(abs(df1$actuals - df1$predicteds))
-rmse1 <- sqrt(mse1)
-print(paste("model1: ", "MAE = ", mae1, ", RMSE = ", rmse1))
+# calculate MAPE
+mape1 <- 100 * mean(abs((df1$actuals - df1$predicteds) / df1$predicteds))
+print(paste("model1 MAPE: ", mape1))
 
-mse2 <- mean((df2$actuals - df2$predicteds)^2)
-mae2 <- mean(abs(df2$actuals - df2$predicteds))
-rmse2 <- sqrt(mse2)
-print(paste("model2: ", "MAE = ", mae2, ", RMSE = ", rmse2))
+mape2 <- 100 * mean(abs((df2$actuals - df2$predicteds) / df2$predicteds))
+print(paste("model2 MAPE: ", mape2))
 
