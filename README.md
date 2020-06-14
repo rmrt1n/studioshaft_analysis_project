@@ -31,6 +31,7 @@ Because of the moderate positive correlation between the number of members and t
 regression model. I also split the data into training and testing set with a 80:20 ratio. I tried 2 models, 1 with a 
 log-transformed Members variable and 1 without. Here are the performances of the models:
 
-**Without transformation:** MAPE = 8.51 %
+**Without transformation:** MAPE = 8.51 %  
+
 **With transformation**: MAPE = 7.50 %
 
